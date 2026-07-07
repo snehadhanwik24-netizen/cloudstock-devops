@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# SQLite
+*.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# VS Code
+.vscode/
