@@ -3,5 +3,5 @@ variable "resource_group_name" {
 }
 
 variable "location" {
-  default = "Central India"
+  default = "South India"
 }
