@@ -5,25 +5,20 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  imageName: 'cloudstockpro'
+  dockerRegistryServiceConnection: 'dockerhub-service-connection'
+  imageRepository: 'snehadhanwik/cloudstockpro'
+  dockerfilePath: 'docker/Dockerfile'
+  tag: 'v1'
 
 steps:
 - checkout: self
 
 - task: Docker@2
-  displayName: Build Docker Image
+  displayName: Build and Push Docker Image
   inputs:
-    command: build
-    Dockerfile: 'docker/Dockerfile'
-    repository: '$(imageName)'
+    command: buildAndPush
+    repository: $(imageRepository)
+    dockerfile: $(dockerfilePath)
+    containerRegistry: $(dockerRegistryServiceConnection)
     tags: |
-      latest
-
-- task: Docker@2
-  displayName: Push Docker Image
-  inputs:
-    command: push
-    repository: '$(imageName)'
-    containerRegistry: 'dockerhub-service-connection'
-    tags: |
-      latest
+      $(tag)
