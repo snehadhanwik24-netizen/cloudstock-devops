@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}
+Reports
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                📊 Inventory Reports
+            </h2>
+
+            <p class="text-muted">
+                Analytics and inventory summary.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow bg-primary text-white">
+
+                <div class="card-body">
+
+                    <h5>Total Products</h5>
+
+                    <h2>{{ total_products }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow bg-success text-white">
+
+                <div class="card-body">
+
+                    <h5>Total Stock</h5>
+
+                    <h2>{{ total_stock }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow bg-warning text-dark">
+
+                <div class="card-body">
+
+                    <h5>Highest Stock</h5>
+
+                    <h6>{{ highest[0] }}</h6>
+
+                    <h3>{{ highest[1] }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card shadow bg-danger text-white">
+
+                <div class="card-body">
+
+                    <h5>Lowest Stock</h5>
+
+                    <h6>{{ lowest[0] }}</h6>
+
+                    <h3>{{ lowest[1] }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h4 class="text-center mb-4">
+
+                        📈 Stock Comparison
+
+                    </h4>
+
+                    <div style="height:350px;">
+    <canvas id="reportChart"></canvas>
+</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow">
+
+                <div class="card-body">
+
+                    <h4 class="mb-4">
+
+                        📋 Summary
+
+                    </h4>
+                                        <table class="table table-bordered">
+
+                        <tr>
+
+                            <th>Total Products</th>
+
+                            <td>{{ total_products }}</td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Total Stock</th>
+
+                            <td>{{ total_stock }}</td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Highest Stock</th>
+
+                            <td>
+
+                                {{ highest[0] }}
+
+                                ({{ highest[1] }})
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>Lowest Stock</th>
+
+                            <td>
+
+                                {{ lowest[0] }}
+
+                                ({{ lowest[1] }})
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const reportCtx = document.getElementById("reportChart");
+
+        new Chart(reportCtx, {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+
+                    "Total Products",
+
+                    "Total Stock"
+
+                ],
+
+                datasets: [{
+
+                    label: "Inventory",
+
+                    data: [
+
+                        {{ total_products }},
+
+                        {{ total_stock }}
+
+                    ],
+
+                    backgroundColor: [
+
+                        "#2563eb",
+
+                        "#16a34a"
+
+                    ],
+
+                    borderRadius: 10
+
+                }]
+
+            },
+                        options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+    <!-- Welcome Banner -->
+
+    <div class="card shadow border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+
+                    <h2 class="fw-bold">
+
+                        👋 Welcome, {{ session.username }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Manage your inventory in real time.
+
+                    </p>
+
+                </div>
+
+                <div class="col-md-4 text-end">
+
+                    <h3 id="clock" class="text-primary fw-bold"></h3>
+
+                    <span id="date" class="text-muted"></span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Dashboard Cards -->
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow border-0 bg-primary text-white">
+
+                <div class="card-body">
+
+                    <h5>Total Products</h5>
+
+                    <h1>{{ total_products }}</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow border-0 bg-success text-white">
+
+                <div class="card-body">
+
+                    <h5>Total Stock</h5>
+
+                    <h1>{{ total_stock }}</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow border-0 bg-dark text-white">
+
+                <div class="card-body">
+
+                    <h5>Inventory Value</h5>
+
+                    <h2>₹ {{ inventory_value }}</h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card shadow border-0 bg-warning text-dark">
+
+                <div class="card-body">
+
+                    <h5>Available Products</h5>
+
+                    <h1>{{ available_products }}</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card shadow border-0 bg-danger text-white">
+
+                <div class="card-body">
+
+                    <h5>Low Stock Items</h5>
+
+                    <h1>{{ low_stock }}</h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+            <div class="row">
+{% if low_stock_count > 0 %}
+
+<div class="alert alert-danger shadow-sm mt-4">
+
+    <h5 class="mb-3">
+        ⚠️ Low Stock Alert ({{ low_stock_count }})
+    </h5>
+
+    <ul class="mb-0">
+
+        {% for product in low_stock_products %}
+
+        <li>
+            <strong>{{ product[1] }}</strong>
+            — Only
+            <strong>{{ product[3] }}</strong>
+            items left.
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+
+{% endif %}
+        <!-- Inventory Chart -->
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h4 class="fw-bold text-center mb-4">
+                        📊 Inventory Overview
+                    </h4>
+
+                   <div style="position:relative; height:350px; width:100%;">
+    <canvas id="inventoryChart"></canvas>
+</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Panel -->
+
+        <div class="col-lg-4">
+
+            <!-- Low Stock -->
+
+            <div class="card shadow border-0 mb-4">
+
+                <div class="card-body">
+
+                   <h5 class="text-danger fw-bold">
+    ⚠️ Low Stock Alert
+</h5>
+
+<hr>
+
+{% if low_stock_count > 0 %}
+
+<p>
+    <strong>{{ low_stock_count }}</strong>
+    product(s) need restocking.
+</p>
+
+<ul class="list-group">
+
+    {% for product in low_stock_products %}
+
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ product["name"] }}</span>
+
+        <span class="badge bg-danger">
+            {{ product["quantity"] }} left
+        </span>
+    </li>
+
+    {% endfor %}
+
+</ul>
+
+{% else %}
+
+<p class="text-success mb-0">
+    ✅ No low stock products.
+</p>
+
+{% endif %}
+
+                </div>
+
+            </div>
+
+            <!-- Quick Actions -->
+
+            <div class="card shadow border-0">
+
+                <div class="card-body">
+
+                    <h5 class="fw-bold">
+                        ⚡ Quick Actions
+                    </h5>
+
+                    <hr>
+
+                    <div class="d-grid gap-2">
+
+                        <a href="/add" class="btn btn-success">
+                            ➕ Add Product
+                        </a>
+
+                        <a href="/products" class="btn btn-primary">
+                            📦 View Products
+                        </a>
+
+                        <a href="/reports" class="btn btn-warning">
+                            📈 Reports
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        const ctx = document.getElementById('inventoryChart');
+
+        new Chart(ctx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: {{ product_names | tojson }},
+
+                datasets: [{
+
+                    label: 'Stock',
+
+                    data: {{ product_quantities | tojson }},
+
+                    backgroundColor: [
+
+                        '#2563eb',
+                        '#16a34a',
+                        '#ea580c',
+                        '#dc2626',
+                        '#7c3aed',
+                        '#0891b2',
+                        '#f59e0b',
+                        '#14b8a6'
+
+                    ],
+
+                    borderRadius: 10
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true
+
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        function updateClock() {
+
+            const now = new Date();
+
+            document.getElementById("clock").innerHTML =
+                now.toLocaleTimeString();
+
+            document.getElementById("date").innerHTML =
+                now.toDateString();
+
+        }
+
+        updateClock();
+
+        setInterval(updateClock, 1000);
+
+    </script>
+
+</div>
+
+{% endblock %}
